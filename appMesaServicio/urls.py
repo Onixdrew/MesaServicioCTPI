@@ -15,6 +15,7 @@ urlpatterns = [
     path('listarCasosParaAsignar/', views.listarCasos),
     path('asignarTecnicoCaso/', views.asignarTecnicoCaso),
     path('listarCasosAsignadosTecnicos/', views.listarCasosAsignadosTecnico),
+    path('solucionarCaso/', views.solucionarCaso),
     path('salir/', views.salir),
 
 ]

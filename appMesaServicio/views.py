@@ -148,10 +148,6 @@ def enviarCorreo(asunto=None, mensaje=None, destinatario=None, archivo=None):
         print(error)
 
 
-def salir(request):
-    auth.logout(request)
-    return render(request, "frmIniciarSesion.html",
-                  {"mensaje": "Ha cerrado la sesión"})
 
 
 # //////////////////////////////
@@ -172,7 +168,7 @@ def listarCasos(request):
 def listarEmpleadosTecnicos(request):
     try:
         # consulta para obtener todos los tecnicos
-        tecnicos=User.objects.filter(groups__name__in=['Tecnico'])
+        tecnicos=User.objects.filter(groups__name__in=['tecnico'])
         mensaje=''
     except Error as error:
         mensaje=str(error)
@@ -240,5 +236,68 @@ def listarCasosAsignadosTecnico(request):
     
     
     
-    
-    
+# //////////////////////////
+
+def solucionarCaso(request):
+    if request.user.is_authenticated:
+        try:
+            if transaction.atomic():
+                
+                procedimiento= request.POST['procedimiento']
+                
+                tipoprocedimientoId=int(request.POST['selectTipoProcedimientos'])
+                tipoProcedimiento=TipoProcedimiento.objects.get(pk=tipoprocedimientoId)
+                
+                idCaso=int(request.POST['idCaso'])
+                caso=Caso.objects.get(pk=idCaso)
+                
+                tipoSolucion= request.POST['selectTipoSolucion']
+                
+                solucionCaso=SolucionCaso(solCaso=caso, solProcedimiento= procedimiento, solTipoSolucion=tipoSolucion)
+                solucionCaso.save()
+                
+                if(tipoSolucion=="Definitiva"):
+                    caso.casEstado="Finalizado"
+                    caso.save()
+                    
+                solucionCasoTipoProcedimiento= SolucionCasoTipoProcedimientos(
+                    solSolucionCaso=solucionCaso,
+                    solTipoProcedimiento=tipoProcedimiento
+                )
+                solucionCasoTipoProcedimiento.save()
+                
+
+                
+                # enviar el correo al empleado que hizo la solicitud
+                solicitud=caso.casSolicitud
+                userEmpleado=solicitud.solUsuario
+                asunto = 'Solución Caso - CTPI-CAUCA'
+                mensajeCorreo = f'Cordial saludo, <b>{userEmpleado.first_name} {userEmpleado.last_name}</b>, nos permitimos \
+                    informarle que se ha dado solución de tipo {tipoSolucion} al caso identificado con el código: \
+                    <b>{caso.casCodigo}</b>. <br><br>Lo invitamos a revisar el equipoy verificar la solución, \
+                    según los acuerdos de solución establecidos para la Mesa de Servicios del CTPI-CAUCA.\
+                    <br><br>Para consultar a detalles la solución, ingresa al sistema para verificar las solicitudes reportadas en la siguiente URL:\
+                    http://mesadeservicioctpicauca.sena.edu.co.'
+                # crear el hilo para el envío del correo
+                thread = threading.Thread(
+                    target=enviarCorreo, args=(asunto, mensajeCorreo, [userEmpleado.email]))
+                # ejecutar el hilo
+                thread.start()         
+        except Error as error:
+                transaction.rollback
+                mensaje=str(error)
+                mensaje=''
+        # retorno={"mensaje":mensaje}
+        return redirect("/listarCasosAsignadosTecnicos/")
+        
+    else:
+        mensaje="Debes iniciar sesión"
+        return render(request, "frmIniciarSesion.html",{"mensaje":mensaje})     
+
+
+
+
+def salir(request):
+    auth.logout(request)
+    return render(request, "frmIniciarSesion.html",
+                  {"mensaje": "Ha cerrado la sesión"})
