@@ -216,4 +216,28 @@ def asignarTecnicoCaso(request):
         return redirect('/listarCasosParaAsignar/')
     else:
         mensaje="Debe iniciar sesión Primero"
+        
+        
+    
+# ///////////////////////////
+def listarCasosAsignadosTecnico(request):
+    if request.user.is_authenticated:
+        try:
+            ListaCasos=Caso.objects.filter(casEstado=" En Proceso",
+                                        casUsuario=request.user)
+            
+            mensaje="lista de casos asignados"
+        except Error as error:
+            mensaje=str(error)
+           
+        retorno={"mensaje":mensaje, "ListaCasos":ListaCasos,
+                "tipoSolucion":tipoSolucion}
+        return render(request,'tecnico/listarCasosAsignados.html',retorno)
+    else:
+        mensaje="debes iniciar sesión"
+        return render(request, "frmIniciarSesion.html",{"mensaje":mensaje})     
+    
+    
+    
+    
     
