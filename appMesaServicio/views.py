@@ -294,6 +294,27 @@ def solucionarCaso(request):
         mensaje="Debes iniciar sesión"
         return render(request, "frmIniciarSesion.html",{"mensaje":mensaje})     
 
+# ////////////////// Generar PDF
+
+def generarPdfSolicitudes(request):
+    from appMesaServicio.pdfSolicitudes import PdF
+    solicitudes= Solicitud.objects.all()
+    
+    # creado en el archivo pdfSolicitudes.py
+    doc= PdF()
+    # Permite colocar el numero de paginas en el pdf
+    doc.alias_nb_pages()
+    # Permite agregar nuevas paginas
+    doc.add_page()
+    
+    # se pasan las solicitudes como argumento
+    doc.mostrarDatos(solicitudes)
+    
+    # generar el archivo Pdf en la carpeta media
+    doc.output(f"media/PDF/solicitudes.pdf")
+    
+    return render(request, "administrador/mostrarPdf.html")
+    
 
 
 

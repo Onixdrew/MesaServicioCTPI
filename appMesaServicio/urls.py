@@ -16,6 +16,9 @@ urlpatterns = [
     path('asignarTecnicoCaso/', views.asignarTecnicoCaso),
     path('listarCasosAsignadosTecnicos/', views.listarCasosAsignadosTecnico),
     path('solucionarCaso/', views.solucionarCaso),
+    # pdf
+    path('pdfSolicitudes/', views.generarPdfSolicitudes),
+    
     path('salir/', views.salir),
 
 ]
