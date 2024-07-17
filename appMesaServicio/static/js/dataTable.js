@@ -92,7 +92,7 @@ function cargarDataTable(tabla, titulo, col) {
         filename: titulo,
         sheetName: "Usuarios",
         title: empresa,
-        className: "bg-success text-white",
+        className: "bg-success text-white ",
         messageTop: titulo + "       Fecha: " + hoy,
         exportOptions: {
           columns: columnas,

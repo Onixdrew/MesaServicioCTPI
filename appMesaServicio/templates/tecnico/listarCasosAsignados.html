@@ -118,7 +118,7 @@
   </div>
 </div>
 
-<script>
+<!-- <script>
     new DataTable('#tablaSolic', {
         layout: {
             topStart: {
@@ -126,8 +126,10 @@
             }
         }
     });
+</script> -->
+<script>
+  cargarDataTable($("#tablaSolic"), "Solicitudes", 5);
 </script>
-<!-- <script>cargarDataTable($('#tablaSolic'),"Solicitudes empleados",5)</script> -->
 
 {%endblock %} 
 {% block piePagina %} 
